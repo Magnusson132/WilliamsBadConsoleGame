@@ -1,0 +1,12 @@
+## .NET build outputs
+bin/
+obj/
+
+## VS/Rider/IDE files
+.vs/
+.idea/
+*.user
+*.suo
+
+## Optional: OS junk
+.DS_Store
