@@ -19,6 +19,7 @@ while (true)
     switch (pressedKey)
     {
         case ConsoleKey.D1:
+            Console.WriteLine("\nAs soon as you see 'Go!' Press Space");
             Console.WriteLine("\nWait...");
             await Task.Delay(GenerateRandomDuration() * 1000);
             Console.WriteLine("\nGo!");
@@ -36,7 +37,9 @@ while (true)
             playerScore.Name = Console.ReadLine();
 
             ScoreBoardAPI scoreBoardApi = new ScoreBoardAPI();
+            Console.WriteLine("\nSubmitting...");
             await scoreBoardApi.PostScore(playerScore);
+            Console.WriteLine("\nScore submitted!");
             await scoreBoardApi.GetScore();
             break;
 
@@ -45,9 +48,6 @@ while (true)
             Console.WriteLine("\nHere is the current scoreboard:");
             await scoreboardApi.GetScore();
             Console.WriteLine("\nGame will now reset to Main Menu");
-            Console.WriteLine("\n.");
-            Console.WriteLine("\n..");
-            Console.WriteLine("\n...");
             break;
 
         case ConsoleKey.D3:

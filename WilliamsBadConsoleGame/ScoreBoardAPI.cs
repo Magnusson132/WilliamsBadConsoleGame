@@ -6,39 +6,44 @@ public class ScoreBoardAPI
 {
     string scoreboardUrl = "https://scoreboard-csharp-william-default-rtdb.europe-west1.firebasedatabase.app/scores.json";
 
-    public async Task PostScore(PlayerScore playerScore){
+    public async Task PostScore(PlayerScore playerScore)
+    {
         HttpClient client = new HttpClient();
-        try {
-            // POST while expecting a response
+        try
+        {
             HttpResponseMessage postResponse = await client.PostAsJsonAsync(scoreboardUrl, playerScore);
-	
             postResponse.EnsureSuccessStatusCode();
-            // Converts response to readable String
             string result = await postResponse.Content.ReadAsStringAsync();
-	
-            // Show the converted response
-            // Console.WriteLine(result);
         }
-
-        catch (HttpRequestException e){
+        catch (HttpRequestException e)
+        {
             Console.WriteLine(e.Message);
         }
     }
-	
-    public async Task GetScore(){
-        try{
+
+    public async Task GetScore()
+    {
+        try
+        {
             HttpClient client = new HttpClient();
 
             Dictionary<string, ScoreEntry>? scores =
                 await client.GetFromJsonAsync<Dictionary<string, ScoreEntry>>(scoreboardUrl);
 
+            var sortedScores = scores.Values
+                .OrderBy(s => s.Score);
 
-            foreach (ScoreEntry score in scores.Values)
+            Console.WriteLine("=== LEADERBOARD ===\n");
+
+            int rank = 1;
+            foreach (ScoreEntry score in sortedScores)
             {
-                Console.WriteLine($"{score.Name}: {score.Score}");
+                Console.WriteLine($"{rank}. {score.Name,-12} {score.Score}");
+                rank++;
             }
         }
-        catch (HttpRequestException e){
+        catch (HttpRequestException e)
+        {
             Console.WriteLine(e.Message);
         }
     }
