@@ -9,10 +9,12 @@ PlayerScore playerScore = new PlayerScore();
 
 while (true)
 {
-    Console.WriteLine("Hello! Welcome to the Stopwatch Game!");
+    Console.WriteLine("\nHello! Welcome to the Stopwatch Game!\n");
     Console.WriteLine("Press 1 to Play");
     Console.WriteLine("Press 2 to Show Scoreboard");
-    Console.WriteLine("Press 3 to Exit");
+    Console.WriteLine("Press 3 to Show Personal Best\n");
+    
+    Console.WriteLine("Press 5 to Exit");
 
     ConsoleKey pressedKey = Console.ReadKey(true).Key;
 
@@ -33,8 +35,13 @@ while (true)
                 playerScore.Score = (int)stopwatch.ElapsedMilliseconds;
             }
 
-            Console.WriteLine("Please enter your name:");
-            playerScore.Name = Console.ReadLine();
+            if (playerScore.Score <= 0)
+            {
+                Console.WriteLine("Invalid score deteced - submission cancelled.");
+                break;
+            }
+
+            playerScore.Name = GetValidName();
 
             ScoreBoardAPI scoreBoardApi = new ScoreBoardAPI();
             Console.WriteLine("\nSubmitting...");
@@ -51,6 +58,12 @@ while (true)
             break;
 
         case ConsoleKey.D3:
+            string playerNameToCheck = GetValidName();
+            ScoreBoardAPI scoreBoardApiPersonal = new ScoreBoardAPI();
+            await scoreBoardApiPersonal.GetPersonalBest(playerNameToCheck ?? "");
+            break;
+        
+        case ConsoleKey.D5:
             Environment.Exit(0);
             break;
 
@@ -59,7 +72,7 @@ while (true)
             break;
     }
 
-    Console.WriteLine(); // blank line before menu repeats, just for readability
+    Console.WriteLine();
 }
 
 int GenerateRandomDuration()
@@ -68,4 +81,21 @@ int GenerateRandomDuration()
     int randomDuration = random.Next(minimumTime, maximumTime);
     Console.WriteLine("The duration of the game is: " + randomDuration);
     return randomDuration;
+}
+
+string GetValidName()
+{
+    string? name;
+    do
+    {
+        Console.WriteLine("Please enter your name:");
+        name = Console.ReadLine();
+
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            Console.WriteLine("Name cannot be blank. Please try again.");
+        }
+    } while (string.IsNullOrWhiteSpace(name));
+
+    return name;
 }

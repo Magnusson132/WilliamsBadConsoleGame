@@ -30,8 +30,15 @@ public class ScoreBoardAPI
             Dictionary<string, ScoreEntry>? scores =
                 await client.GetFromJsonAsync<Dictionary<string, ScoreEntry>>(scoreboardUrl);
 
+            if (scores == null || scores.Count == 0)
+            {
+                Console.WriteLine("No scores found on the scoreboard.");
+                return;
+            }
+
             var sortedScores = scores.Values
-                .OrderBy(s => s.Score);
+                .OrderBy(s => s.Score)
+                .Take(10);
 
             Console.WriteLine("=== LEADERBOARD ===\n");
 
@@ -44,7 +51,48 @@ public class ScoreBoardAPI
         }
         catch (HttpRequestException e)
         {
-            Console.WriteLine(e.Message);
+            Console.WriteLine("Network error: " + e.Message);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Something went wrong: " + e.Message);
+        }
+    }
+    public async Task GetPersonalBest(string playerName)
+    {
+        try
+        {
+            HttpClient client = new HttpClient();
+
+            Dictionary<string, ScoreEntry>? scores =
+                await client.GetFromJsonAsync<Dictionary<string, ScoreEntry>>(scoreboardUrl);
+
+            if (scores == null || scores.Count == 0)
+            {
+                Console.WriteLine("No scores found on the scoreboard.");
+                return;
+            }
+
+            var playerScores = scores.Values
+                .Where(s => s.Name.Equals(playerName, StringComparison.OrdinalIgnoreCase))
+                .OrderBy(s => s.Score);
+
+            if (!playerScores.Any())
+            {
+                Console.WriteLine($"No scores found for '{playerName}'.");
+                return;
+            }
+
+            ScoreEntry best = playerScores.First();
+            Console.WriteLine($"{best.Name}'s personal best: {best.Score} ms");
+        }
+        catch (HttpRequestException e)
+        {
+            Console.WriteLine("Network error: " + e.Message);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Something went wrong: " + e.Message);
         }
     }
 }
